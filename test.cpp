@@ -10,9 +10,7 @@ using std::vector;
 
 int main() {
 
-    vector<int> myVec = {0, 1, 2, 3};
+    cout << vector<int>({0, 1, 2}).back() << endl;
 
-    cout << myVec.at(-1) << endl;
-    // DOES NOT WORK
 
 }

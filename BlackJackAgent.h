@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include "BlackJack.h"
 
 // namespace
 using std::string;
@@ -111,29 +112,11 @@ enum ActionType {
 
 };
 
-// state of agent
-struct State {
-    // all cards are by numeric value, aces are 1s
-
-    // card showing to dealer
-    int dealerShowing;
-
-    // player cards
-    vector<int> playerCards;
-
-    // number of aces player has
-    int playerAces;
-
-    // sum of player cards with all aces as 1
-    int playerSum;
-
-};
-
 // action for history
 struct Action {
 
     // state before action was taken
-    State state;
+    Hands state;
 
     // action type taken
     ActionType type;
@@ -142,7 +125,7 @@ struct Action {
 
 // converts a state struct to an index pair for q table
 // return format is pair<row/player_hand, col/dealer_hand>
-pair<int, int> getTableIndex(State hands) {
+pair<int, int> getTableIndex(Hands state) {
 
     // return index pair
     pair<int, int> indexPair;
@@ -150,19 +133,19 @@ pair<int, int> getTableIndex(State hands) {
     // find player hand
 
     // check for pair
-    if (hands.playerCards.size() == 2 && hands.playerCards.at(0) == hands.playerCards.at(1)) {
+    if (state.playerCards.size() == 2 && state.playerCards.at(0) == state.playerCards.at(1)) {
 
         // set row index
         // pair number - 2 (takes lowest from 2 to 0) + first_pair_index
-        indexPair.first = hands.playerCards.at(0) - 2 + TABLE_FIRST_PAIR_INDEX;
+        indexPair.first = state.playerCards.at(0) - 2 + TABLE_FIRST_PAIR_INDEX;
     
     }
     // check for ace that can still be used (sum is 11 or less so changing 1 to 11 wont bust)
-    else if (hands.playerAces > 0 && hands.playerSum <= 11) {
+    else if (state.playerAces > 0 && state.playerSum <= 11) {
 
         // set row index
         // player sum - 2 (takes lowest from 2 to 0) - 1 (removes ace) + first_ace_index
-        indexPair.first = hands.playerSum - 2 - 1 + TABLE_FIRST_ACE_INDEX;
+        indexPair.first = state.playerSum - 2 - 1 + TABLE_FIRST_ACE_INDEX;
 
     }
     // else treat it as sum
@@ -170,14 +153,14 @@ pair<int, int> getTableIndex(State hands) {
 
         // set row index
         // player sum - 5 (takes lowest from 5 to 0)
-        indexPair.first = hands.playerSum - 5;
+        indexPair.first = state.playerSum - 5;
 
     }
 
     // find dealer hand
 
     // dealer sum - 1 (takes lowest from 1 (ace) to 0)
-    indexPair.second = hands.dealerShowing - 1;
+    indexPair.second = state.dealerShowing - 1;
 
     return indexPair;
 
@@ -185,10 +168,17 @@ pair<int, int> getTableIndex(State hands) {
 }
 
 // returns true if a state can split
-bool canSplit(State hands) {
+bool canSplit(Hands state) {
 
-    return hands.playerCards.size() == 2 && hands.playerCards.at(0) == hands.playerCards.at(1);
+    return state.playerCards.size() == 2 && state.playerCards.at(0) == state.playerCards.at(1);
 }
+
+
+
+
+// figure out splits
+
+
 
 // agent class
 class BlackJackAgent {
@@ -281,7 +271,7 @@ class BlackJackAgent {
         }
 
         // get agent choice
-        ActionType makeMove(State state) {
+        ActionType makeMove(Hands state) {
 
             // get q table coordinates
             pair<int, int> coords = getTableIndex(state);
