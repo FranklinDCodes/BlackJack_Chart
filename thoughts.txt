@@ -1,0 +1,6 @@
+
+
+is it wrong when I am training to update the q values of a state based on looking up values in the table that may have been updated in this very example??
+or should I save the q values that were there at the time of the decision in order to truely train in a batch??
+
+
