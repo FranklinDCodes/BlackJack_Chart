@@ -3,10 +3,8 @@
 is it wrong when I am training to update the q values of a state based on looking up values in the table that may have been updated in this very example??
 or should I save the q values that were there at the time of the decision in order to truely train in a batch??
 
-FIGURE OUT HOW TO HANDLE SPLIT\
-    MAKE A COPY OF GAME FOR AGENT HISTORY??
 
-change dealer ace from int to bool?
+should I make it so that agent cannot hit on 21 or naw?
 
 
 first day of work:

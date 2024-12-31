@@ -98,7 +98,7 @@ int main () {
         while (!gameOver && (agentMove == HIT || agentMove == SPLIT)) {
 
             // get player moves
-            agentMove = agent->makeMove(game.getState());
+            agentMove = agent->makeMove(game->getState());
 
             // carry out agent move
             switch (agentMove) {
@@ -152,23 +152,104 @@ int main () {
         agent->endGame(game->getScore());
 
         // reset game
+        game->reset();
         
         // run other branches of split game
+        while (splits.size() > 0) {
+
+            // play split game
+
+            // fetch split data
+            split = splits.back();
+            splits.pop_back();
+
+            // deal game
+            game->setupSplit(split.playerCard, split.dealerCard1, split.dealerCard2);
+
+            // set game history
+            agent->setGameActions(split.actionHistory);
+
+            // set default agent move for iteration
+            agentMove = HIT;
+
+            // while the game isn't over and player isn't done making moves
+            while (!gameOver && (agentMove == HIT || agentMove == SPLIT)) {
+
+                // get player moves
+                agentMove = agent->makeMove(game->getState());
+
+                // carry out agent move
+                switch (agentMove) {
+                    
+                    // agent hit
+                    case HIT:
+                        
+                        // hit in game
+                        gameOver = game->hit();
+                        break;
+
+                    case SPLIT:
+
+                        // add split info to split list
+                        split = {
+                            game->getState().playerCards.at(0),
+                            game->getState().dealerShowing,
+                            game->getDealerSecondCard(),
+                            agent->getGameActions()
+                        };
+                        splits.push_back(split);
+
+                        break;
+
+                    // agent double 
+                    case DOUBLE:
+
+                        // double bet in game
+                        game->doubleBet();
+
+                        // take hit
+                        gameOver = game->hit();
+                        break;
+
+                    // agent stand
+                    case STAND:
+                        break;
+
+                }
+
+            }
+
+            // player dealer turn if game isn't over
+            if (!gameOver) {
+
+                game->playDealer();
+
+            }
+
+            // set reward for game results
+            agent->endGame(game->getScore());
+
+            // reset game
+            game->reset();
+
+        }
 
         // check if time to train
+        if (gameNum % TRAIN_EVERY == 0) {
 
+            // update q tables
+            agent->train();
+        }
 
     }
 
     // release dealer and agent
     delete dealer;
+    delete game;
     delete agent;
 
     return 0;
 }
-
-
-// make sure not to let player hit on 21
 
 
 

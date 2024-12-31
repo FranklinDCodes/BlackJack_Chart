@@ -168,7 +168,7 @@ pair<int, int> getTableIndex(Hands state) {
 }
 
 // returns true if a state can split
-bool canSplit(Hands state) {
+bool splitPossible(Hands state) {
 
     return state.playerCards.size() == 2 && state.playerCards.at(0) == state.playerCards.at(1);
 }
@@ -277,17 +277,41 @@ class BlackJackAgent {
             pair<int, int> coords = getTableIndex(state);
 
             // check if splitting is an option
-            bool splitPossible = canSplit(state);
+            bool canSplit = splitPossible(state);
 
-            // define action ratings array size based on possible options
-            // removing split as last option
-            int actionsPossible = splitPossible ? ACTION_TYPE_COUNT : ACTION_TYPE_COUNT - 1;
-            double* actionRatings = new double[actionsPossible];
+            // check if hit allowed
+            bool canHit = state.playerSum != 21;
+
+            // parallel vectors of actions and their q values
+            vector<ActionType> actions;
+            vector<double> actionRatings;
 
             // copy q values to action ratings
-            for (int i = 0; i < actionsPossible; i ++) {
+            for (int i = 0; i < ACTION_TYPE_COUNT; i ++) {
 
-                actionRatings[i] = this->qTable[coords.first][coords.second][i];
+                actions.push_back(static_cast<ActionType>(i));
+                actionRatings.push_back(qTable[coords.first][coords.second][i]);
+
+            }
+
+            // remove hit and double if needed
+            if (!canHit) {
+
+                // remove hit option
+                actions.erase(actions.begin() + HIT);
+                actionRatings.erase(actionRatings.begin() + HIT);
+
+                // remove double option
+                actions.erase(actions.begin() + DOUBLE);
+                actionRatings.erase(actionRatings.begin() + DOUBLE);
+
+            }
+            // remove split option if needed
+            else if (!canSplit) {
+
+                // remove double option
+                actions.erase(actions.begin() + SPLIT);
+                actionRatings.erase(actionRatings.begin() + SPLIT);
 
             }
 
@@ -301,14 +325,14 @@ class BlackJackAgent {
             ActionType actionChosen;
 
             // info on max q in action state
-            double* maxQPtr = max_element(actionRatings, actionRatings + actionsPossible);
-            int maxQIndex = maxQPtr - actionRatings;
+            vector<double>::iterator maxQIterator = max_element(actionRatings.begin(), actionRatings.end());
+            int maxQIndex = maxQIterator - actionRatings.begin();
 
             // explore
             if (random < epsilon) {
 
                 // pick random option 
-                actionChosen = static_cast<ActionType>(rand() % actionsPossible);
+                actionChosen = static_cast<ActionType>(rand() % actionRatings.size());
 
             }
             // educated guess 
@@ -317,9 +341,6 @@ class BlackJackAgent {
                 actionChosen = static_cast<ActionType>(maxQIndex);
 
             }
-
-            // delete possible action ratings
-            delete [] actionRatings;
 
             // create new move object
             // set reward to 0 to be replaced later when needed

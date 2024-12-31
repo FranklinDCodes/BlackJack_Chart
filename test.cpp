@@ -5,12 +5,21 @@
 using std::cout, std::endl;
 using std::vector;
 
+enum myEnum {
+    ZERO,
+    ONE,
+    TWO
+};
 
 
 
-/*int main() {
+int main() {
 
-    cout << vector<int>({0, 1, 2}).back() << endl;
+    myEnum x = ONE;
+
+    vector<double> vec = {3, 4, 5, 6, 7};
+
+    cout << vec.at(x) << endl;
 
 
-}*/
+}
