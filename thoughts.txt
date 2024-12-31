@@ -9,3 +9,18 @@ FIGURE OUT HOW TO HANDLE SPLIT\
 change dealer ace from int to bool?
 
 
+first day of work:
+
+    git ls-files | xargs wc -l
+    15 .vscode/settings.json
+    460 BlackJack.h
+    443 BlackJackAgent.h
+    wc: a.exe: No such file or directory
+    14 driver.cpp
+    16 test.cpp
+    11 thoughts.txt
+    959 total
+
+
+    ~900 lines of code
+

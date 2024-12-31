@@ -14,6 +14,9 @@
 #include <random>
 #include <algorithm>
 
+#include <iostream>
+using std::cout, std::endl;
+
 // namespaces
 using std::vector;
 using std::time;
@@ -248,12 +251,8 @@ class Game {
             this->scoreAmounts = scoreAmounts;
         }
 
-        // split constructor
-        // preferred constructor
-        Game(Dealer* dealer, Scoring scoreAmounts, int playerCard, int dealerCard1, int dealerCard2) {
-
-            // init dealer with args
-            this->dealer = dealer;
+        // split setup
+        void setupSplit(int playerCard, int dealerCard1, int dealerCard2) {
 
             // set hands to have cards from split game
             this->table = {dealerCard1, vector<int>({playerCard}), (playerCard == 1) ? 1 : 0, playerCard};
@@ -268,23 +267,18 @@ class Game {
             this->wasPush = false;
             this->score = 0;
 
-            // set scores
-            this->scoreAmounts = scoreAmounts;
-
         }
 
         // deal out both hands
         // returns game over flag
         bool dealHands() {
 
-            int playerCard1, playerCard2, dealerCard1, dealerCard2;
-
             // deal all cards
             // add to sums
             // check for aces
 
             // check for 1 card (from split)
-            if (this->table.playerCards.at(0) != 0) {
+            if (this->table.playerCards.size() == 0) {
 
                 this->table.playerCards.push_back(this->dealer->deal());
                 this->table.playerSum += this->table.playerCards.at(0);
@@ -377,6 +371,11 @@ class Game {
         // play out dealer hits
         void playDealer() {
 
+            // make sure game isn't over
+            if (this->gameOver) {
+                return;
+            }
+
             // dealer attributes
             int dealerSum = this->table.dealerShowing + this->dealerSecondCard;
             bool dealerHasAce = (this->table.dealerShowing == 1 || this->dealerSecondCard == 1);
@@ -393,19 +392,27 @@ class Game {
 
                 // get hit for dealer
                 dealerHit = this->dealer->deal();
+                cout << "dealer hit: " << dealerHit << endl << endl;
 
                 // update sum and ace
                 dealerSum += dealerHit;
                 dealerHasAce = (dealerHasAce || dealerHit == 1);
 
                 // reset bools
-                dealerWillStand = (dealerSum >= DEALER_STAND || ((dealerSum + 10) >= DEALER_STAND && dealerHasAce));
+                // stand if over stand num, or adding 10 will put over stand number, wont bust, and is doable (has ace)
+                dealerWillStand = (dealerSum >= DEALER_STAND || ((dealerSum + 10) >= DEALER_STAND && (dealerSum + 10) <= 21 && dealerHasAce));
                 dealerBusted = (dealerSum > 21);
 
             }
 
             // checking for wins
             // if the player busted, the game shouldn't have made it this far
+
+            // check to switch ace for dealer if has ace and wouldn't bust
+            dealerSum = ((dealerSum + 10) <= 21 && dealerHasAce) ? (dealerSum + 10) : dealerSum;
+
+            // check to switch ace for player if has ace and wouldn't bust
+            this->table.playerSum = ((this->table.playerSum + 10) <= 21 && this->table.playerAces) ? (this->table.playerSum + 10) : this->table.playerSum;
 
             // check for player win 
             if (dealerBusted || dealerSum < this->table.playerSum) {
@@ -440,10 +447,53 @@ class Game {
 
         }
 
+        // reset game so that it is ready for a new one
+        void reset() {
+
+            // set hands to empty
+            this->table = {0, vector<int>(), 0, 0};
+            this->dealerSecondCard = 0;
+
+            // set bet
+            this->doubleGame = false;
+
+            // set game conclusion bools to false
+            this->gameOver = false;
+            this->playerWon = false;
+            this->wasPush = false;
+            this->score = 0;
+
+        }
+
         // state accessor
         Hands getState() const {
 
             return this->table;
+        }
+
+        // access dealers hidden card
+        int getDealerSecondCard() const {
+            return this->dealerSecondCard;
+        }
+
+        // game is over
+        bool getGameOver() const {
+            return this->gameOver;
+        }
+
+        // play was the winner
+        bool getPlayerWon() const {
+            return this->playerWon;
+        }
+
+        // push ending
+        bool getWasPush() const {
+            return this->wasPush;
+        }
+
+        // doubled game if true
+        float getScore() const {
+            return this->score;
         }
 
         // double player bet
@@ -452,7 +502,6 @@ class Game {
             this->doubleGame = true;
         }
 
-        // figure out splits
 
 };
 

@@ -299,12 +299,10 @@ class BlackJackAgent {
 
             // action details
             ActionType actionChosen;
-            double reward;
 
             // info on max q in action state
             double* maxQPtr = max_element(actionRatings, actionRatings + actionsPossible);
             int maxQIndex = maxQPtr - actionRatings;
-            double maxQValue = actionRatings[maxQIndex];
 
             // explore
             if (random < epsilon) {
@@ -382,7 +380,7 @@ class BlackJackAgent {
             double currentQValue;
 
             // iterate through games
-            for (int i = 0; i < this->trainingExamples.size(); i ++) {
+            for (unsigned int i = 0; i < this->trainingExamples.size(); i ++) {
 
                 // get list of game actions
                 gameActions = this->trainingExamples.at(i).first;
@@ -391,7 +389,7 @@ class BlackJackAgent {
                 gameReward = this->trainingExamples.at(i).second;
 
                 // iterate through game actions backward
-                for (int j = gameActions.size() - 1; j > 0; i --) {
+                for (unsigned int j = gameActions.size() - 1; j > 0; i --) {
                     
                     // get current action
                     action = gameActions.at(j);
@@ -436,6 +434,16 @@ class BlackJackAgent {
 
             }
 
+        }
+
+        // set game action history for splits
+        void setGameActions(vector<Action> actions) {
+
+            this->gameActions = actions;
+        }
+
+        vector<Action> getGameActions() const {
+            return this->gameActions;
         }
 
 };
