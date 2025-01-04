@@ -152,7 +152,7 @@ class Dealer {
         int deal() {
             
             // grab card
-            cout << deck.size() << endl;
+            // cout << deck.size() << endl;
             int card = this->deck.back();
             
             // deal card
