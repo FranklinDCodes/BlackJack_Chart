@@ -11,6 +11,7 @@
         "xutility": "cpp",
         "functional": "cpp",
         "random": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "ostream": "cpp"
     }
 }

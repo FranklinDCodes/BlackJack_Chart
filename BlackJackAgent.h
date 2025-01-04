@@ -174,12 +174,6 @@ bool splitPossible(Hands state) {
 }
 
 
-
-
-// figure out splits
-
-
-
 // agent class
 class BlackJackAgent {
 
@@ -315,18 +309,27 @@ class BlackJackAgent {
 
             }
 
+            //cout << "setup options" << endl;
+
             // calculate epsilon
+            //cout << this->trainingCountTotal << endl;
             double epsilon = this->E_FUNC(this->trainingCountTotal);
+            //cout << epsilon << endl;
+
 
             // get random number between 0-1
-            double random = (static_cast<double>(rand()) / RAND_MAX);
+            double rand1 = static_cast<double>(rand());
+            //cout << rand1 << " RANDOM " << endl;
+            double random = (rand1 / RAND_MAX);
 
             // action details
             ActionType actionChosen;
 
+            //cout << "about to calc index" << endl;
             // info on max q in action state
             vector<double>::iterator maxQIterator = max_element(actionRatings.begin(), actionRatings.end());
             int maxQIndex = maxQIterator - actionRatings.begin();
+            //cout << "index calced" << endl;
 
             // explore
             if (random < epsilon) {
@@ -342,6 +345,8 @@ class BlackJackAgent {
 
             }
 
+            //cout << "action picked" << endl;
+
             // create new move object
             // set reward to 0 to be replaced later when needed
             Action action = {
@@ -351,6 +356,9 @@ class BlackJackAgent {
 
             // add action to history
             this->gameActions.push_back(action);
+
+            //cout << "action pushed back" << endl;
+
 
             // return action type
             return actionChosen;
@@ -401,6 +409,7 @@ class BlackJackAgent {
             double currentQValue;
 
             // iterate through games
+            // cout << "Opening examples" << endl;
             for (unsigned int i = 0; i < this->trainingExamples.size(); i ++) {
 
                 // get list of game actions
@@ -410,7 +419,7 @@ class BlackJackAgent {
                 gameReward = this->trainingExamples.at(i).second;
 
                 // iterate through game actions backward
-                for (unsigned int j = gameActions.size() - 1; j > 0; i --) {
+                for (unsigned int j = gameActions.size() - 1; j > 0; j --) {
                     
                     // get current action
                     action = gameActions.at(j);
@@ -454,6 +463,11 @@ class BlackJackAgent {
                 }
 
             }
+            // cout << "exiting examples" << endl;
+
+
+            // empty training examples
+            vector<pair<vector<Action>, double>>().swap(this->trainingExamples);
 
         }
 
@@ -463,10 +477,16 @@ class BlackJackAgent {
             this->gameActions = actions;
         }
 
+        // get all actions of the game so far
         vector<Action> getGameActions() const {
             return this->gameActions;
         }
 
+        // get table
+        double (*getQTable())[DEALER_HAND_COUNT][ACTION_TYPE_COUNT] {
+            return this->qTable;
+        }
+        
 };
 
 #endif

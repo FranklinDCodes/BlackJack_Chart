@@ -48,16 +48,16 @@ struct Hands {
     // all cards are by numeric value, aces are 1s
 
     // card showing to dealer
-    int dealerShowing;
+    int dealerShowing = 0;
 
     // player cards
-    vector<int> playerCards;
+    vector<int> playerCards = {};
 
     // number of aces player has
-    int playerAces;
+    int playerAces = 0;
 
     // sum of player cards with all aces as 1
-    int playerSum;
+    int playerSum = 0;
 
 };
 
@@ -152,6 +152,7 @@ class Dealer {
         int deal() {
             
             // grab card
+            cout << deck.size() << endl;
             int card = this->deck.back();
             
             // deal card
@@ -392,7 +393,6 @@ class Game {
 
                 // get hit for dealer
                 dealerHit = this->dealer->deal();
-                cout << "dealer hit: " << dealerHit << endl << endl;
 
                 // update sum and ace
                 dealerSum += dealerHit;

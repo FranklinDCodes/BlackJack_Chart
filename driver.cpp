@@ -9,13 +9,14 @@
 #include "BlackJackAgent.h"
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 // namespace
 using std::cout, std::endl;
 using std::exp;
 
 // CONSTANT TRAINING PARAMETERS
-const auto EPSILON = [](int x) {return 1 / (1 + exp((1/1.2e4)*x - 3));};
+const auto EPSILON = [](int x) -> double {return (1 / (1 + exp((1/1.2e4)*x - 3)));};
 const float GAMMA = 1.0;
 const float ALPHA = 1e-3;
 const int GAME_COUNT = 150000;
@@ -34,6 +35,9 @@ const Scoring SCORES = {
     0     // push;
 
 };
+
+// chart info
+const string CHART_NAME = "BlackJackChart0.csv";
 
 // print state function
 void printTable(Hands table, int dealer2nd) {
@@ -86,6 +90,7 @@ int main () {
     SplitInfo split;
 
     // iterate through games
+    cout << "Beginning training..." << endl;
     for (int gameNum = 0; gameNum < GAME_COUNT; gameNum ++) {
 
         // deal game
@@ -97,20 +102,26 @@ int main () {
         // while the game isn't over and player isn't done making moves
         while (!gameOver && (agentMove == HIT || agentMove == SPLIT)) {
 
+            //cout << "In game" << endl;
+
             // get player moves
             agentMove = agent->makeMove(game->getState());
+
+            //cout << "agent move made" << endl;
 
             // carry out agent move
             switch (agentMove) {
                 
                 // agent hit
                 case HIT:
-                    
+                    //cout << "hit" << endl;
+
                     // hit in game
                     gameOver = game->hit();
                     break;
 
                 case SPLIT:
+                    //cout << "split" << endl;
 
                     // add split info to split list
                     split = {
@@ -125,6 +136,7 @@ int main () {
 
                 // agent double 
                 case DOUBLE:
+                    //cout << "double" << endl;
 
                     // double bet in game
                     game->doubleBet();
@@ -135,11 +147,15 @@ int main () {
 
                 // agent stand
                 case STAND:
+                    //cout << "stand" << endl;
+
                     break;
 
             }
 
         }
+
+        //cout << "player played" << endl;
 
         // player dealer turn if game isn't over
         if (!gameOver) {
@@ -147,6 +163,7 @@ int main () {
             game->playDealer();
 
         }
+        //cout << "dealer played" << endl;
 
         // set reward for game results
         agent->endGame(game->getScore());
@@ -233,19 +250,69 @@ int main () {
             game->reset();
 
         }
+        //cout << "splits played" << endl;
 
         // check if time to train
         if (gameNum % TRAIN_EVERY == 0) {
 
             // update q tables
             agent->train();
+            cout << "Trained through games " << gameNum << endl;
+
         }
+        //cout << "trained?" << endl;
 
     }
 
-    // release dealer and agent
+    cout << "Training complete." << endl;
+
+    // release dealer and game
     delete dealer;
     delete game;
+
+    // build chart out of agent
+
+    // get q values
+    auto qtable = agent->getQTable();
+
+    // open file
+    ofstream outfile(CHART_NAME);
+
+    // write top left corner
+    outfile << ",";
+
+    // write header
+    for (int i = 0; i < DEALER_HAND_COUNT; i ++) {
+
+        outfile << DEALER_HANDS[i] << ",";
+
+    }
+    outfile << endl;
+
+    // max q index finders
+    int maxQ;
+
+    // iterate through possible hand combos
+    for (int i = 0; i < PLAYER_HAND_COUNT; i ++) {
+
+        // print player hand
+        outfile << PLAYER_HANDS[i] << ",";
+
+        for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
+
+            // get highest q value index
+            maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT - 1) - qtable[i][j];
+
+            // print action
+            cout << static_cast<ActionType>(maxQ) << ",";
+
+        }
+
+        outfile << endl;
+    }
+
+    // cleanup
+    outfile.close();
     delete agent;
 
     return 0;
