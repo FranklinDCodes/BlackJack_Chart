@@ -428,7 +428,7 @@ class BlackJackAgent {
                     stateIndices = getTableIndex(action.state);
 
                     // get highest q value before update
-                    preUpdateHighestQ = *max_element(this->qTable[stateIndices.first][stateIndices.second], this->qTable[stateIndices.first][stateIndices.second] + ACTION_TYPE_COUNT);
+                    preUpdateHighestQ = *max_element(this->qTable[stateIndices.first][stateIndices.second], this->qTable[stateIndices.first][stateIndices.second] + ACTION_TYPE_COUNT - 1);
 
                     // as long as this isn't the last one
                     if (j != this->gameActions.size() - 1) {
