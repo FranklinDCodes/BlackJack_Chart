@@ -301,7 +301,7 @@ int main () {
         for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
 
             // get highest q value index
-            maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT - 1) - qtable[i][j];
+            maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT) - qtable[i][j];
 
             // print action
             cout << static_cast<ActionType>(maxQ) << ",";

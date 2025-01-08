@@ -387,6 +387,28 @@ class BlackJackAgent {
         // train on training examples accumulated
         void train() {
 
+            // print the number of training examples
+            cout << "Game count: " << this->trainingExamples.size() << endl;
+
+            int total = 0;
+            int totalCards = 0;
+            for (int i = 0; i < this->trainingExamples.size(); i ++) {
+
+                // add size of first element in game vector (game examples)
+                total += this->trainingExamples.at(i).first.size();
+
+                // add size of hand in each example vector
+                for (int j = 0; j < this->trainingExamples.at(i).first.size(); j ++) {
+
+                    totalCards += this->trainingExamples.at(i).first.at(j).state.playerCards.size();
+
+                }
+
+            }
+
+            cout << "Training example count: " << total << endl;
+            cout << "Card count: " << totalCards << endl;
+
             // list of game actions
             vector<Action> gameActions;
 
@@ -408,6 +430,9 @@ class BlackJackAgent {
             // current q value for iterating
             double currentQValue;
 
+            // whether this is the last example with no future reward
+            bool lastExample;
+
             // iterate through games
             // cout << "Opening examples" << endl;
             for (unsigned int i = 0; i < this->trainingExamples.size(); i ++) {
@@ -419,19 +444,20 @@ class BlackJackAgent {
                 gameReward = this->trainingExamples.at(i).second;
 
                 // iterate through game actions backward
-                for (unsigned int j = gameActions.size() - 1; j > 0; j --) {
+                lastExample = true;
+                while (gameActions.size() > 0) {
                     
                     // get current action
-                    action = gameActions.at(j);
+                    action = gameActions.back();
 
                     // get move coordinates
                     stateIndices = getTableIndex(action.state);
 
                     // get highest q value before update
-                    preUpdateHighestQ = *max_element(this->qTable[stateIndices.first][stateIndices.second], this->qTable[stateIndices.first][stateIndices.second] + ACTION_TYPE_COUNT - 1);
+                    preUpdateHighestQ = *max_element(this->qTable[stateIndices.first][stateIndices.second], this->qTable[stateIndices.first][stateIndices.second] + ACTION_TYPE_COUNT);
 
                     // as long as this isn't the last one
-                    if (j != this->gameActions.size() - 1) {
+                    if (!lastExample) {
 
                         // get current q value
                         currentQValue = this->qTable[stateIndices.first][stateIndices.second][action.type];
@@ -460,11 +486,14 @@ class BlackJackAgent {
                     // set next highest q value
                     nextHighestQ = preUpdateHighestQ;
 
+                    // pop the last training example
+                    gameActions.pop_back();
+                    lastExample = false;
+
                 }
 
             }
             // cout << "exiting examples" << endl;
-
 
             // empty training examples
             vector<pair<vector<Action>, double>>().swap(this->trainingExamples);
