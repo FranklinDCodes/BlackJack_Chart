@@ -51,7 +51,7 @@ struct Hands {
     int dealerShowing = 0;
 
     // player cards
-    vector<int> playerCards = {};
+    vector<int> playerCards;
 
     // number of aces player has
     int playerAces = 0;
@@ -249,10 +249,30 @@ class Game {
             this->score = 0;
 
             // set scores
+            cout << scoreAmounts.blackjack << endl;
+            cout << scoreAmounts.doubleLoss << endl;
+            cout << scoreAmounts.doubleWin << endl;
+            cout << scoreAmounts.loss << endl;
+            cout << scoreAmounts.push << endl;
+            cout << scoreAmounts.win << endl;
+
             this->scoreAmounts = scoreAmounts;
         }
 
-        // split setup
+        // setup the game to play first half of split
+        void runSplit() {
+
+            // remove second card
+            this->table.playerCards.pop_back();
+            this->table.playerSum = this->table.playerCards.at(0);
+            this->table.playerAces = (this->table.playerCards.at(0) == 1) ? 1 : 0;
+
+            // add new second card
+            this->hit();
+
+        }
+
+        // split setup to play 2nd half
         void setupSplit(int playerCard, int dealerCard1, int dealerCard2) {
 
             // set hands to have cards from split game
@@ -383,7 +403,7 @@ class Game {
             int dealerHit;
 
             // check if dealer will stand (check to use ace as 11)
-            bool dealerWillStand = (dealerSum >= DEALER_STAND || ((dealerSum + 10) >= DEALER_STAND && dealerHasAce));
+            bool dealerWillStand = (dealerSum >= DEALER_STAND || ((dealerSum + 10) >= DEALER_STAND && (dealerSum + 10) <= 21 && dealerHasAce));
 
             // dealer went over 21
             bool dealerBusted = (dealerSum > 21);
@@ -501,7 +521,6 @@ class Game {
 
             this->doubleGame = true;
         }
-
 
 };
 

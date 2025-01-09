@@ -23,8 +23,8 @@ const int GAME_COUNT = 150000;
 const int TRAIN_EVERY = 100;
 
 // CONSTANT BLACKJACK GAME PARAMETERS
-const int DECK_COUNT = 4;
-const int SHUFFLE_EVERY_N_DECKS = 2;
+const int DECK_COUNT = 2;
+const int SHUFFLE_EVERY_N_DECKS = 1;
 const Scoring SCORES = {
 
     1.5,  // blackjack;
@@ -37,7 +37,8 @@ const Scoring SCORES = {
 };
 
 // chart info
-const string CHART_NAME = "BlackJackChart0.csv";
+const string CHART_NAME = "BlackJackChart1.csv";
+const string DATA_CHART_NAME = "BlackJackChart1_data.csv";
 
 // print state function
 void printTable(Hands table, int dealer2nd) {
@@ -71,7 +72,7 @@ struct SplitInfo {
 int main () {
 
     // blackjack dealer
-    Dealer* dealer = new Dealer;
+    Dealer* dealer = new Dealer(DECK_COUNT, SHUFFLE_EVERY_N_DECKS);
 
     // blackjack game
     Game* game = new Game(dealer, SCORES);
@@ -123,7 +124,7 @@ int main () {
                 case SPLIT:
                     //cout << "split" << endl;
 
-                    // add split info to split list
+                    // add split info to split list to play other side of game
                     split = {
                         game->getState().playerCards.at(0),
                         game->getState().dealerShowing,
@@ -131,6 +132,9 @@ int main () {
                         agent->getGameActions()
                     };
                     splits.push_back(split);
+
+                    // setup this half of the game
+                    game->runSplit();
 
                     break;
 
@@ -186,6 +190,9 @@ int main () {
             // set game history
             agent->setGameActions(split.actionHistory);
 
+            // deal player second card
+            game->hit();
+
             // set default agent move for iteration
             agentMove = HIT;
 
@@ -215,6 +222,9 @@ int main () {
                             agent->getGameActions()
                         };
                         splits.push_back(split);
+
+                        // setup first half of game
+                        game->runSplit();
 
                         break;
 
@@ -257,10 +267,10 @@ int main () {
 
             // update q tables
             agent->train();
-            cout << "Trained through games " << gameNum << endl;
+            cout << "Trained through games " << gameNum << endl << endl;
+
 
         }
-        //cout << "trained?" << endl;
 
     }
 
@@ -274,6 +284,7 @@ int main () {
 
     // get q values
     auto qtable = agent->getQTable();
+    auto qtableCounts = agent->getQTableCounts();
 
     // open file
     ofstream outfile(CHART_NAME);
@@ -304,7 +315,41 @@ int main () {
             maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT) - qtable[i][j];
 
             // print action
-            cout << static_cast<ActionType>(maxQ) << ",";
+            outfile << ACTION_NAMES[maxQ] << ",";
+
+        }
+
+        outfile << endl;
+    }
+    outfile.close();
+
+    // print training counts
+    outfile.open(DATA_CHART_NAME);
+
+    // write top left corner
+    outfile << ",";
+
+    // write header
+    for (int i = 0; i < DEALER_HAND_COUNT; i ++) {
+
+        outfile << DEALER_HANDS[i] << ",";
+
+    }
+    outfile << endl;
+
+    // iterate through possible hand combos
+    for (int i = 0; i < PLAYER_HAND_COUNT; i ++) {
+
+        // print player hand
+        outfile << PLAYER_HANDS[i] << ",";
+
+        for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
+
+            // get highest q value index
+            maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT) - qtable[i][j];
+
+            // print action
+            outfile << qtableCounts[i][j][maxQ] << ",";
 
         }
 

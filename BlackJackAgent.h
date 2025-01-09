@@ -111,6 +111,14 @@ enum ActionType {
     SPLIT
 
 };
+const string ACTION_NAMES[] = {
+
+    "STAND",
+    "HIT",
+    "DOUBLE",
+    "SPLIT"
+
+};
 
 // action for history
 struct Action {
@@ -273,8 +281,11 @@ class BlackJackAgent {
             // check if splitting is an option
             bool canSplit = splitPossible(state);
 
-            // check if hit allowed
-            bool canHit = state.playerSum != 21;
+            // check if 21
+            bool has21 = state.playerSum == 21;
+
+            // check if the player hasn't done any actions already
+            bool firstAction = state.playerCards.size() == 2;
 
             // parallel vectors of actions and their q values
             vector<ActionType> actions;
@@ -288,8 +299,8 @@ class BlackJackAgent {
 
             }
 
-            // remove hit and double if needed
-            if (!canHit) {
+            // remove hit and double if player at 21
+            if (has21) {
 
                 // remove hit option
                 actions.erase(actions.begin() + HIT);
@@ -303,9 +314,21 @@ class BlackJackAgent {
             // remove split option if needed
             else if (!canSplit) {
 
-                // remove double option
+                // remove split option
                 actions.erase(actions.begin() + SPLIT);
                 actionRatings.erase(actionRatings.begin() + SPLIT);
+
+            }
+            // remove double and split if not first move
+            else if (!firstAction) {
+
+                // remove split option
+                actions.erase(actions.begin() + SPLIT);
+                actionRatings.erase(actionRatings.begin() + SPLIT);
+
+                // remove double option
+                actions.erase(actions.begin() + DOUBLE);
+                actionRatings.erase(actionRatings.begin() + DOUBLE);
 
             }
 
@@ -386,28 +409,6 @@ class BlackJackAgent {
 
         // train on training examples accumulated
         void train() {
-
-            // print the number of training examples
-            cout << "Game count: " << this->trainingExamples.size() << endl;
-
-            int total = 0;
-            int totalCards = 0;
-            for (int i = 0; i < this->trainingExamples.size(); i ++) {
-
-                // add size of first element in game vector (game examples)
-                total += this->trainingExamples.at(i).first.size();
-
-                // add size of hand in each example vector
-                for (int j = 0; j < this->trainingExamples.at(i).first.size(); j ++) {
-
-                    totalCards += this->trainingExamples.at(i).first.at(j).state.playerCards.size();
-
-                }
-
-            }
-
-            cout << "Training example count: " << total << endl;
-            cout << "Card count: " << totalCards << endl;
 
             // list of game actions
             vector<Action> gameActions;
@@ -514,6 +515,11 @@ class BlackJackAgent {
         // get table
         double (*getQTable())[DEALER_HAND_COUNT][ACTION_TYPE_COUNT] {
             return this->qTable;
+        }
+
+        // get data table
+        int (*getQTableCounts())[DEALER_HAND_COUNT][ACTION_TYPE_COUNT] {
+            return this->trainingCounts;
         }
         
 };
