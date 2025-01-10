@@ -13,6 +13,7 @@
         "random": "cpp",
         "iosfwd": "cpp",
         "ostream": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "limits": "cpp"
     }
 }

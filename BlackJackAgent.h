@@ -66,6 +66,7 @@ const string PLAYER_HANDS[PLAYER_HAND_COUNT] = {
     "A-10",
 
     // Pairs section
+    "A-A",
     "2-2",
     "3-3",
     "4-4",
@@ -75,7 +76,6 @@ const string PLAYER_HANDS[PLAYER_HAND_COUNT] = {
     "8-8",
     "9-9",
     "10-10",
-    "A-A"
 
 };
 
@@ -145,7 +145,7 @@ pair<int, int> getTableIndex(Hands state) {
 
         // set row index
         // pair number - 2 (takes lowest from 2 to 0) + first_pair_index
-        indexPair.first = state.playerCards.at(0) - 2 + TABLE_FIRST_PAIR_INDEX;
+        indexPair.first = state.playerCards.at(0) - 1 + TABLE_FIRST_PAIR_INDEX;
     
     }
     // check for ace that can still be used (sum is 11 or less so changing 1 to 11 wont bust)
@@ -175,12 +175,18 @@ pair<int, int> getTableIndex(Hands state) {
 
 }
 
+// returns true if a player hand table index can split
+bool handIdxCanSplit(int index) {
+
+    return index >= TABLE_FIRST_PAIR_INDEX;
+
+}
+
 // returns true if a state can split
 bool splitPossible(Hands state) {
 
     return state.playerCards.size() == 2 && state.playerCards.at(0) == state.playerCards.at(1);
 }
-
 
 // agent class
 class BlackJackAgent {

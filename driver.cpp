@@ -10,21 +10,27 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <limits>
+#include <iomanip>
 
 // namespace
 using std::cout, std::endl;
 using std::exp;
+using std::numeric_limits;
+using std::setw, std::fixed;
 
 // CONSTANT TRAINING PARAMETERS
-const auto EPSILON = [](int x) -> double {return (1 / (1 + exp((1/1.2e4)*x - 3)));};
+const double E_COEFFICIENT = (1/1.5e5);
+const double E_RIGHT_SHIFT = 4;
+const auto EPSILON = [](int x) -> double {return (1 / (1 + exp(E_COEFFICIENT*x - E_RIGHT_SHIFT)));};
 const float GAMMA = 1.0;
-const float ALPHA = 1e-3;
-const int GAME_COUNT = 150000;
-const int TRAIN_EVERY = 100;
+const float ALPHA = 1;
+const int GAME_COUNT = 5e6;
+const int TRAIN_EVERY = 500;
 
 // CONSTANT BLACKJACK GAME PARAMETERS
-const int DECK_COUNT = 2;
-const int SHUFFLE_EVERY_N_DECKS = 1;
+const int DECK_COUNT = 4;
+const int SHUFFLE_EVERY_N_DECKS = 2;
 const Scoring SCORES = {
 
     1.5,  // blackjack;
@@ -35,10 +41,6 @@ const Scoring SCORES = {
     0     // push;
 
 };
-
-// chart info
-const string CHART_NAME = "BlackJackChart1.csv";
-const string DATA_CHART_NAME = "BlackJackChart1_data.csv";
 
 // print state function
 void printTable(Hands table, int dealer2nd) {
@@ -69,7 +71,26 @@ struct SplitInfo {
 };
 
 // main
-int main () {
+int main(int argc, char* argv[]) {
+
+    // chart names
+    const string CHART_ID = argv[1];
+    const string CHART_NAME = "Chart" + CHART_ID + ".csv";
+
+    // chart saying training examples for each max q action
+    const string MAX_TRAINING_CHART_NAME = "Chart" + CHART_ID + "_backing.csv";
+
+    // chart saying all q values
+    const string Q_CHART_NAME = "Chart" + CHART_ID + "_Q.csv";
+
+    // chart saying all training examples
+    const string TRAINING_CHART_NAME = "Chart" + CHART_ID + "_wholeBacking.csv";
+
+    // text file containing all the parameters of creation
+    const string PARAM_FILE_NAME = CHART_ID + "_parameters.txt";
+
+    // note of what makes this chart unique
+    const string CHART_NOTE = "Even higher learning rate";
 
     // blackjack dealer
     Dealer* dealer = new Dealer(DECK_COUNT, SHUFFLE_EVERY_N_DECKS);
@@ -280,13 +301,10 @@ int main () {
     delete dealer;
     delete game;
 
+
     // build chart out of agent
 
-    // get q values
-    auto qtable = agent->getQTable();
-    auto qtableCounts = agent->getQTableCounts();
-
-    // open file
+    // open chart
     ofstream outfile(CHART_NAME);
 
     // write top left corner
@@ -311,8 +329,17 @@ int main () {
 
         for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
 
+            
+            // check if can split
+            if (!handIdxCanSplit(i)) {
+
+                // set split value to min if not possible
+                agent->getQTable()[i][j][SPLIT] = numeric_limits<int>::min();
+
+            }
+
             // get highest q value index
-            maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT) - qtable[i][j];
+            maxQ = max_element(agent->getQTable()[i][j], agent->getQTable()[i][j] + ACTION_TYPE_COUNT) - agent->getQTable()[i][j];
 
             // print action
             outfile << ACTION_NAMES[maxQ] << ",";
@@ -323,8 +350,9 @@ int main () {
     }
     outfile.close();
 
+
     // print training counts
-    outfile.open(DATA_CHART_NAME);
+    outfile.open(MAX_TRAINING_CHART_NAME);
 
     // write top left corner
     outfile << ",";
@@ -346,22 +374,152 @@ int main () {
         for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
 
             // get highest q value index
-            maxQ = max_element(qtable[i][j], qtable[i][j] + ACTION_TYPE_COUNT) - qtable[i][j];
+            maxQ = max_element(agent->getQTable()[i][j], agent->getQTable()[i][j] + ACTION_TYPE_COUNT) - agent->getQTable()[i][j];
 
             // print action
-            outfile << qtableCounts[i][j][maxQ] << ",";
+            outfile << agent->getQTableCounts()[i][j][maxQ] << ",";
 
         }
 
         outfile << endl;
     }
+    outfile.close();
+
+
+    // print q values
+    outfile.open(Q_CHART_NAME);
+
+    // write top left corner
+    outfile << ",";
+
+    // write header
+    for (int i = 0; i < DEALER_HAND_COUNT; i ++) {
+
+        outfile << DEALER_HANDS[i] << ",";
+
+    }
+    outfile << endl;
+
+    // iterate through possible hand combos
+    for (int i = 0; i < PLAYER_HAND_COUNT; i ++) {
+
+        // print player hand
+        outfile << PLAYER_HANDS[i] << ",";
+
+        for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
+
+            // print q values
+            outfile << "[" << setw(4) << fixed;
+
+            for (int k = 0; k < ACTION_TYPE_COUNT - 1; k ++) {
+
+                // print action if not numerical min
+                if (agent->getQTable()[i][j][k] == numeric_limits<int>::min()) {
+
+                    outfile << " _  ";
+
+                }
+                else {
+
+                    outfile << agent->getQTable()[i][j][k] << " ";
+
+                }
+
+            }
+
+            // print action if not numerical min
+            if (agent->getQTable()[i][j][ACTION_TYPE_COUNT - 1] == numeric_limits<int>::min()) {
+
+                outfile << " _ ";
+
+            }
+            else {
+
+                outfile << agent->getQTable()[i][j][ACTION_TYPE_COUNT - 1];
+
+            }
+
+            outfile << "],";
+
+        }
+
+        outfile << endl;
+    }
+    outfile.close();
+
+
+    // print all training counts
+    outfile.open(TRAINING_CHART_NAME);
+
+    // write top left corner
+    outfile << ",";
+
+    // write header
+    for (int i = 0; i < DEALER_HAND_COUNT; i ++) {
+
+        outfile << DEALER_HANDS[i] << ",";
+
+    }
+    outfile << endl;
+
+    // iterate through possible hand combos
+    for (int i = 0; i < PLAYER_HAND_COUNT; i ++) {
+
+        // print player hand
+        outfile << PLAYER_HANDS[i] << ",";
+
+        for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
+
+            // print q values
+            outfile << "[";
+
+            for (int k = 0; k < ACTION_TYPE_COUNT - 1; k ++) {
+
+                // print action
+                outfile << agent->getQTableCounts()[i][j][k] << " ";
+
+            }
+
+            outfile << agent->getQTableCounts()[i][j][ACTION_TYPE_COUNT - 1];
+
+            outfile << "],";
+
+        }
+
+        outfile << endl;
+    }
+    outfile.close();
+
+
+    // print all training counts
+    outfile.open(PARAM_FILE_NAME);
+
+    // write epsilon function parameter
+    outfile << "Training parameters for chart #" << CHART_ID << endl;
+    outfile << "\tChart note: " << CHART_NOTE << endl << endl;
+    outfile << "Epsilon Function:" << endl;
+    outfile << "\ttype: sigmoid" << endl;
+    outfile << "\tx coefficient: " << E_COEFFICIENT << endl;
+    outfile << "\tx right shift: " << E_RIGHT_SHIFT << endl;
+    outfile << "Gamma: " << GAMMA << endl;
+    outfile << "Alpha: " << ALPHA << endl;
+    outfile << "Game count: " << GAME_COUNT << endl;
+    outfile << "Training interval: " << TRAIN_EVERY << " games" << endl;
+    outfile << "Deck count: " << DECK_COUNT << endl;
+    outfile << "Reshuffle interval: " << SHUFFLE_EVERY_N_DECKS << " decks" << endl;
+    outfile << "Rewards:" << endl;
+    outfile << "\tWin: " << SCORES.win << endl;
+    outfile << "\tBlackjack: " << SCORES.blackjack << endl;
+    outfile << "\tDouble: " << SCORES.doubleWin << endl;
+    outfile << "\tLoss: " << SCORES.loss << endl;
+    outfile << "\tDouble loss: " << SCORES.doubleLoss << endl;
+    outfile << "\tPush: " << SCORES.push << endl;
+    
+    outfile.close();
+
 
     // cleanup
-    outfile.close();
     delete agent;
 
     return 0;
 }
-
-
-

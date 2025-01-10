@@ -23,5 +23,4 @@ first day of work:
     ~900 lines of code
 
 
-find out what caused giant memory issue and make a note of it
 
