@@ -21,12 +21,15 @@ using std::setw, std::fixed;
 
 // CONSTANT TRAINING PARAMETERS
 const double E_COEFFICIENT = (1/1.5e5);
-const double E_RIGHT_SHIFT = 4;
+const double E_RIGHT_SHIFT = 3.75;
 const auto EPSILON = [](int x) -> double {return (1 / (1 + exp(E_COEFFICIENT*x - E_RIGHT_SHIFT)));};
 const float GAMMA = 1.0;
-const float ALPHA = 1;
-const int GAME_COUNT = 5e6;
-const int TRAIN_EVERY = 500;
+const float ALPHA = 1e-3;
+const int GAME_COUNT = 2e6;
+const int TRAIN_EVERY = 1500;
+
+// note of what makes this chart unique
+const string CHART_NOTE = "Change right shift to 3.75";
 
 // CONSTANT BLACKJACK GAME PARAMETERS
 const int DECK_COUNT = 4;
@@ -57,25 +60,15 @@ void printTable(Hands table, int dealer2nd) {
 
 }
 
-// struct to hold info on splits
-struct SplitInfo {
-
-    // cards for game
-    int playerCard;
-    int dealerCard1;
-    int dealerCard2;
-
-    // action history for agent
-    vector<Action> actionHistory;
-
-};
-
 // main
 int main(int argc, char* argv[]) {
 
     // chart names
     const string CHART_ID = argv[1];
     const string CHART_NAME = "Chart" + CHART_ID + ".csv";
+
+    // chart that can be used by computer
+    const string USABLE_CHART_NAME = "Chart" + CHART_ID + "_readable.csv";
 
     // chart saying training examples for each max q action
     const string MAX_TRAINING_CHART_NAME = "Chart" + CHART_ID + "_backing.csv";
@@ -88,9 +81,6 @@ int main(int argc, char* argv[]) {
 
     // text file containing all the parameters of creation
     const string PARAM_FILE_NAME = CHART_ID + "_parameters.txt";
-
-    // note of what makes this chart unique
-    const string CHART_NOTE = "Even higher learning rate";
 
     // blackjack dealer
     Dealer* dealer = new Dealer(DECK_COUNT, SHUFFLE_EVERY_N_DECKS);
@@ -295,7 +285,7 @@ int main(int argc, char* argv[]) {
 
     }
 
-    cout << "Training complete." << endl;
+    cout << "Training complete." << endl << endl;
 
     // release dealer and game
     delete dealer;
@@ -343,6 +333,50 @@ int main(int argc, char* argv[]) {
 
             // print action
             outfile << ACTION_NAMES[maxQ] << ",";
+
+        }
+
+        outfile << endl;
+    }
+    outfile.close();
+
+
+    // open chart that is usable
+    outfile.open(USABLE_CHART_NAME);
+
+    // write top left corner
+    outfile << ",";
+
+    // write header
+    for (int i = 0; i < DEALER_HAND_COUNT; i ++) {
+
+        outfile << DEALER_HANDS[i] << ",";
+
+    }
+    outfile << endl;
+
+    // iterate through possible hand combos
+    for (int i = 0; i < PLAYER_HAND_COUNT; i ++) {
+
+        // print player hand
+        outfile << PLAYER_HANDS[i] << ",";
+
+        for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
+
+            
+            // check if can split
+            if (!handIdxCanSplit(i)) {
+
+                // set split value to min if not possible
+                agent->getQTable()[i][j][SPLIT] = numeric_limits<int>::min();
+
+            }
+
+            // get highest q value index
+            maxQ = max_element(agent->getQTable()[i][j], agent->getQTable()[i][j] + ACTION_TYPE_COUNT) - agent->getQTable()[i][j];
+
+            // print action
+            outfile << maxQ << ",";
 
         }
 

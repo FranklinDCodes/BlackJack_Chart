@@ -249,13 +249,6 @@ class Game {
             this->score = 0;
 
             // set scores
-            cout << scoreAmounts.blackjack << endl;
-            cout << scoreAmounts.doubleLoss << endl;
-            cout << scoreAmounts.doubleWin << endl;
-            cout << scoreAmounts.loss << endl;
-            cout << scoreAmounts.push << endl;
-            cout << scoreAmounts.win << endl;
-
             this->scoreAmounts = scoreAmounts;
         }
 

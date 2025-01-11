@@ -131,6 +131,19 @@ struct Action {
 
 };
 
+// struct to hold info on splits
+struct SplitInfo {
+
+    // cards for game
+    int playerCard;
+    int dealerCard1;
+    int dealerCard2;
+
+    // action history for agent
+    vector<Action> actionHistory;
+
+};
+
 // converts a state struct to an index pair for q table
 // return format is pair<row/player_hand, col/dealer_hand>
 pair<int, int> getTableIndex(Hands state) {
@@ -500,7 +513,6 @@ class BlackJackAgent {
                 }
 
             }
-            // cout << "exiting examples" << endl;
 
             // empty training examples
             vector<pair<vector<Action>, double>>().swap(this->trainingExamples);
@@ -509,7 +521,6 @@ class BlackJackAgent {
 
         // set game action history for splits
         void setGameActions(vector<Action> actions) {
-
             this->gameActions = actions;
         }
 

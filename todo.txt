@@ -1,6 +1,5 @@
 
-fix splits on chart and 0 training counts?
-    It's because all options are negative and split is 0 I presume
+Fix so that splits end with the same dealer hand !!!!!!!!
 
 find out what caused giant memory issue and make a note of it
 
