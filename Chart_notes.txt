@@ -1,0 +1,3 @@
+
+Best chart: 31
+Fixed double issue after 28

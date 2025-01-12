@@ -108,7 +108,11 @@ enum ActionType {
     STAND,
     HIT,
     DOUBLE,
-    SPLIT
+    SPLIT,
+
+    // doubles with alternatives for building chart later
+    DOUBLE_STAND,
+    DOUBLE_HIT
 
 };
 const string ACTION_NAMES[] = {
@@ -116,7 +120,9 @@ const string ACTION_NAMES[] = {
     "STAND",
     "HIT",
     "DOUBLE",
-    "SPLIT"
+    "SPLIT",
+    "DOUBLE/STAND",
+    "DOUBLE/HIT"
 
 };
 

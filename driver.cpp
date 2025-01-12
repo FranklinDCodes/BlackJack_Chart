@@ -21,15 +21,15 @@ using std::setw, std::fixed;
 
 // CONSTANT TRAINING PARAMETERS
 const double E_COEFFICIENT = (1/1.5e5);
-const double E_RIGHT_SHIFT = 3.75;
+const double E_RIGHT_SHIFT = 4;
 const auto EPSILON = [](int x) -> double {return (1 / (1 + exp(E_COEFFICIENT*x - E_RIGHT_SHIFT)));};
 const float GAMMA = 1.0;
 const float ALPHA = 1e-3;
-const int GAME_COUNT = 2e6;
-const int TRAIN_EVERY = 1500;
+const int GAME_COUNT = 3e6;
+const int TRAIN_EVERY = 2000;
 
 // note of what makes this chart unique
-const string CHART_NOTE = "Change right shift to 3.75";
+const string CHART_NOTE = "3 mil games, larger training interval.";
 
 // CONSTANT BLACKJACK GAME PARAMETERS
 const int DECK_COUNT = 4;
@@ -319,20 +319,40 @@ int main(int argc, char* argv[]) {
 
         for (int j = 0; j < DEALER_HAND_COUNT; j ++) {
 
-            
             // check if can split
             if (!handIdxCanSplit(i)) {
 
                 // set split value to min if not possible
-                agent->getQTable()[i][j][SPLIT] = numeric_limits<int>::min();
+                agent->getQTable()[i][j][SPLIT] = numeric_limits<double>::min();
 
             }
 
             // get highest q value index
             maxQ = max_element(agent->getQTable()[i][j], agent->getQTable()[i][j] + ACTION_TYPE_COUNT) - agent->getQTable()[i][j];
 
-            // print action
-            outfile << ACTION_NAMES[maxQ] << ",";
+            // check for max double
+            if (maxQ == DOUBLE) {
+
+                // if stand is a higher second option than hit...
+                if (agent->getQTable()[i][j][STAND] > agent->getQTable()[i][j][HIT]) {
+
+                    outfile << ACTION_NAMES[DOUBLE_STAND] << ",";
+
+                }
+                else {
+
+                    outfile << ACTION_NAMES[DOUBLE_HIT] << ",";
+
+                }
+
+            }
+            // else add to chart
+            else {
+
+                // print action
+                outfile << ACTION_NAMES[maxQ] << ",";
+
+            }
 
         }
 
@@ -375,8 +395,29 @@ int main(int argc, char* argv[]) {
             // get highest q value index
             maxQ = max_element(agent->getQTable()[i][j], agent->getQTable()[i][j] + ACTION_TYPE_COUNT) - agent->getQTable()[i][j];
 
-            // print action
-            outfile << maxQ << ",";
+            // check for max double
+            if (maxQ == DOUBLE) {
+
+                // if stand is a higher second option than hit...
+                if (agent->getQTable()[i][j][STAND] > agent->getQTable()[i][j][HIT]) {
+
+                    outfile << DOUBLE_STAND << ",";
+
+                }
+                else {
+
+                    outfile << DOUBLE_HIT << ",";
+
+                }
+
+            }
+            // else add to chart
+            else {
+
+                // print action
+                outfile << maxQ << ",";
+
+            }
 
         }
 

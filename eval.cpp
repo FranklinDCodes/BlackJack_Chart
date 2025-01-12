@@ -111,6 +111,8 @@ int main(int argc, char* argv[]) {
     pair<int, int> stateCoords;
     SplitInfo split;
     vector<SplitInfo> splits;
+    vector<ActionType> possibleActions;
+    vector<double> actionRatings;
 
     // iter through rounds
     for (int round = 0; round < ROUND_COUNT; round ++) {
@@ -138,8 +140,42 @@ int main(int argc, char* argv[]) {
 
                 // get player moves
                 stateCoords = getTableIndex(game->getState());
-                agentMove = static_cast<ActionType>(chart[stateCoords.first][stateCoords.second]);
+                
+                // check if player has to stand on 21
+                if (game->getState().playerSum == 21) {
 
+                    agentMove = STAND;
+
+                }
+                // get chart option
+                else {
+                    
+                    // lookup on chart
+                    agentMove = static_cast<ActionType>(chart[stateCoords.first][stateCoords.second]);
+
+                    // check if can't double and it's a double hit
+                    if (agentMove == DOUBLE_HIT && game->getState().playerCards.size() != 2) {
+                        
+                        // set hit
+                        agentMove = HIT;
+
+                    }
+                    // check if can't double and it's a double stand
+                    else if (agentMove == DOUBLE_STAND && game->getState().playerCards.size() != 2) {
+                        
+                        // set hit
+                        agentMove = STAND;
+
+                    }
+                    // else if still double
+                    else if (agentMove == DOUBLE_HIT || agentMove == DOUBLE_STAND) {
+
+                        agentMove = DOUBLE;
+
+                    }
+
+                }
+                
                 // carry out agent move
                 switch (agentMove) {
                     
@@ -167,7 +203,6 @@ int main(int argc, char* argv[]) {
 
                     // agent double 
                     case DOUBLE:
-                        //cout << "double" << endl;
 
                         // double bet in game
                         game->doubleBet();

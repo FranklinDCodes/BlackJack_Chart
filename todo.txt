@@ -1,6 +1,8 @@
 
 Fix so that splits end with the same dealer hand !!!!!!!!
 
+Make second option for double when not available
+
 find out what caused giant memory issue and make a note of it
 
 
