@@ -1,10 +1,10 @@
 Training parameters for chart #29
-	Chart note: Change right shift to 3.75
+	Chart note: 23 repeat, with double fix
 
 Epsilon Function:
 	type: sigmoid
 	x coefficient: 0.000007
-	x right shift: 3.750000
+	x right shift: 4.000000
 Gamma: 1.000000
 Alpha: 0.001000
 Game count: 2000000

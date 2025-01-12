@@ -7,5 +7,5 @@ Bet per game: $0.5
 Deck count: 4
 Decks dealt before reshuffle: 2
 Results:
-	Average final balance: $1045.96
-	Average balance increase: $45.9639 | 4.59639%
+	Average final balance: $1047.99
+	Average balance increase: $47.992 | 4.7992%

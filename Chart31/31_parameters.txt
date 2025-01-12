@@ -1,14 +1,14 @@
 Training parameters for chart #31
-	Chart note: 3 mil games, larger training interval.
+	Chart note: Back to standard, add 0 to x coef.
 
 Epsilon Function:
 	type: sigmoid
-	x coefficient: 0.000007
+	x coefficient: 0.000001
 	x right shift: 4.000000
 Gamma: 1.000000
 Alpha: 0.001000
-Game count: 3000000
-Training interval: 2000 games
+Game count: 2000000
+Training interval: 1500 games
 Deck count: 4
 Reshuffle interval: 2 decks
 Rewards:

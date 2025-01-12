@@ -20,16 +20,16 @@ using std::numeric_limits;
 using std::setw, std::fixed;
 
 // CONSTANT TRAINING PARAMETERS
-const double E_COEFFICIENT = (1/1.5e5);
+const double E_COEFFICIENT = 7e-7;
 const double E_RIGHT_SHIFT = 4;
 const auto EPSILON = [](int x) -> double {return (1 / (1 + exp(E_COEFFICIENT*x - E_RIGHT_SHIFT)));};
 const float GAMMA = 1.0;
 const float ALPHA = 1e-3;
-const int GAME_COUNT = 3e6;
-const int TRAIN_EVERY = 2000;
+const int GAME_COUNT = 2e6;
+const int TRAIN_EVERY = 1500;
 
 // note of what makes this chart unique
-const string CHART_NOTE = "3 mil games, larger training interval.";
+const string CHART_NOTE = "Back to standard, add 0 to x coef.";
 
 // CONSTANT BLACKJACK GAME PARAMETERS
 const int DECK_COUNT = 4;

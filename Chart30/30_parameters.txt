@@ -1,5 +1,5 @@
 Training parameters for chart #30
-	Chart note: Chart 23 re-run, with double feature fixed.
+	Chart note: 3 mil games, larger training interval.
 
 Epsilon Function:
 	type: sigmoid
@@ -7,8 +7,8 @@ Epsilon Function:
 	x right shift: 4.000000
 Gamma: 1.000000
 Alpha: 0.001000
-Game count: 2000000
-Training interval: 1500 games
+Game count: 3000000
+Training interval: 2000 games
 Deck count: 4
 Reshuffle interval: 2 decks
 Rewards:

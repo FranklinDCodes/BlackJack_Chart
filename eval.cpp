@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cmath>
 #include "BlackJack.h"
 #include "BlackJackAgent.h"
 
@@ -17,6 +18,14 @@ using std::string;
 using std::getline;
 using std::stoi;
 using std::ifstream, std::ofstream;
+using std::log;
+
+
+// logarithm function with custom base
+double logb(int base, double x) {
+
+    return log(x) / log(base);
+}
 
 // constants
 
@@ -29,8 +38,37 @@ const int GAME_COUNT = 1000;
 // starting balance for each round
 const double STARTING_BAL = 1000.0;
 
-// amount to be for each game
-const double BET = 0.50;
+// betting calculation
+// percent of current free cash to bet
+const float P = 0.08;
+// amount of free cash interval to bet when in-between intervals
+const float Z = 0.01;
+// the minimum betting interval
+const int IMIN = 100;
+// the speed at which the betting intervals grow
+const int ISPEED = 10;
+// the size by which the betting intervals grow
+const int ISIZE = 10;
+// betting and saving interval function
+auto I = [](double x) -> int {
+    int floorLog = logb(ISPEED, x);
+    return (floorLog < IMIN) ? IMIN : floorLog;
+};
+// betting function
+auto Bet = [](double bal) -> double {
+    // return no balance
+    if (bal <= 0)
+        return 0.0;
+    
+    // calc bet
+    int floorInterval = bal / I(bal);
+    double bet = (bal - I(bal) * floorInterval) * P;
+    // return zero bet if between intervals
+    if (bet == 0.0) 
+        return Z * I(bal);
+    // return bet
+    return bet;
+};
 
 // Game parameters
 const int DECK_COUNT = 4;
@@ -57,6 +95,12 @@ int main(int argc, char* argv[]) {
     const string CHART_PATH = "Chart" + CHART_ID + "/Chart" + CHART_ID + "_readable.csv";
 
     // save info to this filename
+    // if eval ID was given
+    if (argc > 2) {
+        const string EVAL_ID = argv[2];
+        const string SAVE_PATH = "Chart" + CHART_ID + "/Eval" + CHART_ID + "_" + EVAL_ID + ".txt";
+
+    }
     const string SAVE_PATH = "Chart" + CHART_ID + "/Eval" + CHART_ID + ".txt";
 
     // announce
@@ -256,7 +300,41 @@ int main(int argc, char* argv[]) {
 
                     // get player moves
                     stateCoords = getTableIndex(game->getState());
-                    agentMove = static_cast<ActionType>(chart[stateCoords.first][stateCoords.second]);
+
+                    // check if player has to stand on 21
+                    if (game->getState().playerSum == 21) {
+
+                        agentMove = STAND;
+
+                    }
+                    // get chart option
+                    else {
+                        
+                        // lookup on chart
+                        agentMove = static_cast<ActionType>(chart[stateCoords.first][stateCoords.second]);
+
+                        // check if can't double and it's a double hit
+                        if (agentMove == DOUBLE_HIT && game->getState().playerCards.size() != 2) {
+                            
+                            // set hit
+                            agentMove = HIT;
+
+                        }
+                        // check if can't double and it's a double stand
+                        else if (agentMove == DOUBLE_STAND && game->getState().playerCards.size() != 2) {
+                            
+                            // set hit
+                            agentMove = STAND;
+
+                        }
+                        // else if still double
+                        else if (agentMove == DOUBLE_HIT || agentMove == DOUBLE_STAND) {
+
+                            agentMove = DOUBLE;
+
+                        }
+
+                    }
 
                     // carry out agent move
                     switch (agentMove) {

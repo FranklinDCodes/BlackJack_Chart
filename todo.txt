@@ -1,4 +1,6 @@
 
+MAKE MINIMUM BET (1 cent)
+
 Fix so that splits end with the same dealer hand !!!!!!!!
 
 Make second option for double when not available
