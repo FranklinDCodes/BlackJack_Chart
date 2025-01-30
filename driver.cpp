@@ -20,16 +20,16 @@ using std::numeric_limits;
 using std::setw, std::fixed;
 
 // CONSTANT TRAINING PARAMETERS
-const double E_COEFFICIENT = 7e-7;
+const double E_COEFFICIENT = 6e-7;
 const double E_RIGHT_SHIFT = 4;
 const auto EPSILON = [](int x) -> double {return (1 / (1 + exp(E_COEFFICIENT*x - E_RIGHT_SHIFT)));};
 const float GAMMA = 1.0;
-const float ALPHA = 1e-3;
-const int GAME_COUNT = 2e6;
-const int TRAIN_EVERY = 1500;
+const float ALPHA = 4e-3;
+const int GAME_COUNT = 14e6;
+const int TRAIN_EVERY = 2000;
 
 // note of what makes this chart unique
-const string CHART_NOTE = "Back to standard, add 0 to x coef.";
+const string CHART_NOTE = "56 repeat";
 
 // CONSTANT BLACKJACK GAME PARAMETERS
 const int DECK_COUNT = 4;
@@ -574,7 +574,7 @@ int main(int argc, char* argv[]) {
     outfile << "\tChart note: " << CHART_NOTE << endl << endl;
     outfile << "Epsilon Function:" << endl;
     outfile << "\ttype: sigmoid" << endl;
-    outfile << "\tx coefficient: " << E_COEFFICIENT << endl;
+    outfile << "\tx coefficient: " << setw(10) << E_COEFFICIENT << endl;
     outfile << "\tx right shift: " << E_RIGHT_SHIFT << endl;
     outfile << "Gamma: " << GAMMA << endl;
     outfile << "Alpha: " << ALPHA << endl;

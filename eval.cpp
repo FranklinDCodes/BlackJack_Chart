@@ -36,13 +36,13 @@ const int ROUND_COUNT = 5000;
 const int GAME_COUNT = 1000;
 
 // starting balance for each round
-const double STARTING_BAL = 1000.0;
+const double STARTING_BAL = 1000;
 
 // betting calculation
 // percent of current free cash to bet
 const float P = 0.08;
 // amount of free cash interval to bet when in-between intervals
-const float Z = 0.01;
+const float M = 2;
 // the minimum betting interval
 const int IMIN = 100;
 // the speed at which the betting intervals grow
@@ -55,19 +55,26 @@ auto I = [](double x) -> int {
     return (floorLog < IMIN) ? IMIN : floorLog;
 };
 // betting function
-auto Bet = [](double bal) -> double {
+/*auto Bet = [](double bal) -> double {
     // return no balance
-    if (bal <= 0)
+    if (bal < M)
         return 0.0;
     
     // calc bet
     int floorInterval = bal / I(bal);
     double bet = (bal - I(bal) * floorInterval) * P;
     // return zero bet if between intervals
-    if (bet == 0.0) 
-        return Z * I(bal);
+    if (bet <= M) 
+        return M;
     // return bet
     return bet;
+};*/
+auto Bet = [](double bal) -> double {
+    return M;
+};
+// returns true if betting possible
+auto CanBet = [](double bal) -> bool {
+    return bal >= M;
 };
 
 // Game parameters
@@ -151,6 +158,7 @@ int main(int argc, char* argv[]) {
 
     // game variables
     bool gameOver;
+    double bet;
     ActionType agentMove;
     pair<int, int> stateCoords;
     SplitInfo split;
@@ -170,8 +178,16 @@ int main(int argc, char* argv[]) {
         // start games
         for (int gameNum = 0; gameNum < GAME_COUNT; gameNum ++) {
 
+            // break if broke
+            if (!CanBet(bal)) {
+                
+                bal = 0;
+                break;
+            }
+
             // take bet
-            bal -= BET;
+            bet = Bet(bal); 
+            bal -= bet;
 
             // deal game
             gameOver = game->dealHands();
@@ -250,6 +266,7 @@ int main(int argc, char* argv[]) {
 
                         // double bet in game
                         game->doubleBet();
+                        bal -= bet;
 
                         // take hit
                         gameOver = game->hit();
@@ -272,7 +289,7 @@ int main(int argc, char* argv[]) {
             }
 
             // update balance
-            bal += BET + game->getScore() * BET;
+            bal += bet + game->getScore() * bet;
 
             // reset game
             game->reset();
@@ -291,6 +308,9 @@ int main(int argc, char* argv[]) {
 
                 // deal player second card
                 game->hit();
+
+                // take bet
+                bal -= bet;
 
                 // set default agent move for iteration
                 agentMove = HIT;
@@ -366,6 +386,7 @@ int main(int argc, char* argv[]) {
 
                             // double bet in game
                             game->doubleBet();
+                            bal -= bet;
 
                             // take hit
                             gameOver = game->hit();
@@ -387,7 +408,7 @@ int main(int argc, char* argv[]) {
                 }
 
                 // update balance
-                bal += BET + game->getScore() * BET;
+                bal += bet + game->getScore() * bet;
 
                 // reset game
                 game->reset();
@@ -409,7 +430,14 @@ int main(int argc, char* argv[]) {
     outfile << "Gambling rounds: " << ROUND_COUNT << endl;
     outfile << "Games per round: " <<  GAME_COUNT << endl;
     outfile << "Round starting balance: $" << STARTING_BAL << endl;
-    outfile << "Bet per game: $" << BET << endl;
+    outfile << "Bet per game: $ const betting strat" << endl;
+
+
+    // SET BET STUFF!!!!
+
+
+
+
     outfile << "Deck count: " << DECK_COUNT << endl;
     outfile << "Decks dealt before reshuffle: " << SHUFFLE_EVERY_N_DECKS << endl;
     outfile << "Results:" << endl;

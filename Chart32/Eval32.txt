@@ -1,0 +1,11 @@
+Evaluation for Chart32
+
+Gambling rounds: 5000
+Games per round: 1000
+Round starting balance: $1000
+Bet per game: $ NOT SETUP YET
+Deck count: 4
+Decks dealt before reshuffle: 2
+Results:
+	Average final balance: $726.233
+	Average balance increase: $-273.767 | -27.3767%

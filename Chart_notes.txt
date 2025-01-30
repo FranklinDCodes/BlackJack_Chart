@@ -1,3 +1,9 @@
 
-Best chart: 29
+Best chart:
+    const bet: 48
+    bet strat: 55
+
 Fixed double issue after 28
+betting strategy after 31, also hadn't been taking bets for doubles before that
+
+idea: make games until ep ~0.01

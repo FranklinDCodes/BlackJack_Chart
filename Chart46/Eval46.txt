@@ -1,0 +1,11 @@
+Evaluation for Chart46
+
+Gambling rounds: 5000
+Games per round: 1000
+Round starting balance: $1000
+Bet per game: $ const betting strat
+Deck count: 4
+Decks dealt before reshuffle: 2
+Results:
+	Average final balance: $989.094
+	Average balance increase: $-10.906 | -1.0906%

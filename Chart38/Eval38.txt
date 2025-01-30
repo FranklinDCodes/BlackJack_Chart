@@ -1,0 +1,11 @@
+Evaluation for Chart38
+
+Gambling rounds: 5000
+Games per round: 1000
+Round starting balance: $1000
+Bet per game: $ NOT SETUP YET
+Deck count: 4
+Decks dealt before reshuffle: 2
+Results:
+	Average final balance: $836.024
+	Average balance increase: $-163.976 | -16.3976%

@@ -1,0 +1,20 @@
+Training parameters for chart #44
+	Chart note: 42 recreation
+
+Epsilon Function:
+	type: sigmoid
+	x coefficient: 0.000001
+	x right shift: 4.000000
+Gamma: 1.000000
+Alpha: 0.003000
+Game count: 8000000
+Training interval: 1500 games
+Deck count: 4
+Reshuffle interval: 2 decks
+Rewards:
+	Win: 1.000000
+	Blackjack: 1.500000
+	Double: 2.000000
+	Loss: -1.000000
+	Double loss: -2.000000
+	Push: 0.000000

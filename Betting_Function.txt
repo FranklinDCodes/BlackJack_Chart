@@ -8,9 +8,9 @@ Once it gets to 103$ for example, the new betting interval is from 100-200$.
 Now the bet amount will be used by multiplying P by all cash over 100$.
 So if you have 102$ and P = 0.08, you will bet (2)(0.08) or $0.16.
 If the balance should happen to land on a space precisely between two intervals,
-lets say $100.00 even, the bet will be M times the interval size.
-Lets say in this case the balance is $100, M = 0.01, i = 100, then the bet will be (0.01)(100) = 1$
-Eventuall after betting for a while, the betting interval will increase.
+lets say $100.00 even, or the bet is unreasonably small, the bet will bet determined by the minimum value M.
+Lets say in this case the balance is $100, M = 1 then the bet will be 1$
+Eventually after betting for a while, the betting interval will increase.
 Maybe by the time you get to 1000$, you can now bet all the free cash between 1000-2000$, then 2000-3000$ ...
 i will increase at a steady rate.
 Maybe the function will be such that i increases every time 10 intervals are completed.
