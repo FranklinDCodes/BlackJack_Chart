@@ -99,16 +99,18 @@ int main(int argc, char* argv[]) {
 
     // chart name
     const string CHART_ID = argv[1];
-    const string CHART_PATH = "Chart" + CHART_ID + "/Chart" + CHART_ID + "_readable.csv";
+    const string CHART_PATH = "../charts/Chart" + CHART_ID + "/Chart" + CHART_ID + "_readable.csv";
 
     // save info to this filename
     // if eval ID was given
     if (argc > 2) {
         const string EVAL_ID = argv[2];
-        const string SAVE_PATH = "Chart" + CHART_ID + "/Eval" + CHART_ID + "_" + EVAL_ID + ".txt";
+        const string SAVE_PATH = "../charts/Chart" + CHART_ID + "/Eval" + CHART_ID + "_" + EVAL_ID + ".txt";
 
     }
-    const string SAVE_PATH = "Chart" + CHART_ID + "/Eval" + CHART_ID + ".txt";
+    else {
+        const string SAVE_PATH = "../charts/Chart" + CHART_ID + "/Eval" + CHART_ID + ".txt";
+    }
 
     // announce
     cout << "Evaluating chart..." << endl;
@@ -431,12 +433,8 @@ int main(int argc, char* argv[]) {
     outfile << "Games per round: " <<  GAME_COUNT << endl;
     outfile << "Round starting balance: $" << STARTING_BAL << endl;
     outfile << "Bet per game: $ const betting strat" << endl;
-
-
+    
     // SET BET STUFF!!!!
-
-
-
 
     outfile << "Deck count: " << DECK_COUNT << endl;
     outfile << "Decks dealt before reshuffle: " << SHUFFLE_EVERY_N_DECKS << endl;

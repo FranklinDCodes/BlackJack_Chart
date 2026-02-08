@@ -5,9 +5,10 @@
 runNum=$1
 
 # create new dir
-mkdir Chart${runNum}
+mkdir charts/Chart${runNum}
 
 # compile cpp prog
+cd src
 g++ driver.cpp -Wall -o driver.exe
 
 # run prog
@@ -22,12 +23,12 @@ TRAINING_CHART_NAME="Chart${runNum}_wholeBacking.csv"
 PARAM_FILE_NAME="${runNum}_parameters.txt"
 
 # move all result files
-mv ${CHART_NAME} Chart${runNum}/${CHART_NAME}
-mv ${USABLE_CHART_NAME} Chart${runNum}/${USABLE_CHART_NAME}
-mv ${MAX_TRAINING_CHART_NAME} Chart${runNum}/${MAX_TRAINING_CHART_NAME}
-mv ${Q_CHART_NAME} Chart${runNum}/${Q_CHART_NAME}
-mv ${TRAINING_CHART_NAME} Chart${runNum}/${TRAINING_CHART_NAME}
-mv ${PARAM_FILE_NAME} Chart${runNum}/${PARAM_FILE_NAME}
+mv ${CHART_NAME} ../charts/Chart${runNum}/${CHART_NAME}
+mv ${USABLE_CHART_NAME} ../charts/Chart${runNum}/${USABLE_CHART_NAME}
+mv ${MAX_TRAINING_CHART_NAME} ../charts/Chart${runNum}/${MAX_TRAINING_CHART_NAME}
+mv ${Q_CHART_NAME} ../charts/Chart${runNum}/${Q_CHART_NAME}
+mv ${TRAINING_CHART_NAME} ../charts/Chart${runNum}/${TRAINING_CHART_NAME}
+mv ${PARAM_FILE_NAME} ../charts/Chart${runNum}/${PARAM_FILE_NAME}
 
 # compile evaluation
 g++ eval.cpp -Wall -o eval.exe
@@ -38,3 +39,5 @@ g++ eval.cpp -Wall -o eval.exe
 # delete executables
 rm driver.exe
 rm eval.exe
+
+cd ..

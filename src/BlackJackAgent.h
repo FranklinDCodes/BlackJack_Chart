@@ -407,7 +407,6 @@ class BlackJackAgent {
 
             //cout << "action pushed back" << endl;
 
-
             // return action type
             return actionChosen;
 
